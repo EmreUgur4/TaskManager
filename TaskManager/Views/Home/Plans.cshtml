@@ -1,0 +1,51 @@
+﻿@using TaskManager.Entities
+@model List<Plan>
+
+<style>
+    .thead-dark{
+        background-color:teal;
+        color:white;
+    }
+</style>
+
+<br />
+<br />
+<br />
+
+<div class="row">
+    <div class="col-md-2"><a href="/Home/Daily" class="form-control btn btn-success">Günlük</a></div>
+    <div class="col-md-2"><a href="/Home/Weekly" class="form-control btn btn-warning">Haftalık</a></div>
+    <div class="col-md-2"><a href="/Home/Monthly" class="form-control btn btn-info">Aylık</a></div>
+    <div class="col-md-4"></div>
+    <div class="col-md-2"><a href="/Home/Index" class="form-control btn btn-primary"><span class="glyphicon glyphicon-plus"></span>&nbsp;Yeni Plan</a></div>
+</div>
+
+<br />
+
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>Başlık</th>
+            <th>Açıklama</th>
+            <th>Plan Tipi</th>
+            <th>Bitiş Tarihi</th>
+            <th>Yapıldı</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Plan plan in Model)
+        {
+            <tr>
+                <td>@plan.Title</td>
+                <td>@plan.Desc</td>
+                <td>@plan.Type</td>
+                <td>@plan.EndTime</td>
+                <td>@plan.IsDone</td>
+                <td><a class="form-control btn btn-success" href="/Home/EditPlan/@plan.Id.ToString()" id="@plan.Id">Düzenle</a><br /><br />
+                    <a class="form-control btn btn-danger" href="/Home/DeletePlan/@plan.Id.ToString()" id="@plan.Id">Sil</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

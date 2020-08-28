@@ -4,14 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TaskManager.Entities;
+using TaskManager.WebApi.Services;
 
-namespace TaskManager
+namespace TaskManager.WebApi
 {
     public class Startup
     {
@@ -25,24 +27,11 @@ namespace TaskManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            MongoConnection.ConnectionString = this.Configuration.GetConnectionString("MongoConnectionString");
-            MongoConnection.DatabaseName = this.Configuration.GetConnectionString("MongoDatabase");
-
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(15);
-                options.Cookie.HttpOnly = true;
-            });
+            string mongoConnectionString = this.Configuration.GetConnectionString("MongoConnectionString");
+            string mongoDatabase = this.Configuration.GetConnectionString("MongoDatabase");
+            services.AddTransient(s => new TaskManagerUserRepository(mongoConnectionString, mongoDatabase, "TaskManagerUser"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,21 +43,11 @@ namespace TaskManager
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-            app.UseSession();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=User}/{action=Index}/{id?}");
-            });
+            app.UseMvc();
         }
     }
 }
