@@ -114,7 +114,7 @@ namespace TaskManager.WebApp.BusinessLayer
         {
             try
             {
-                model.Id = new ObjectId(Id);
+                model.Id = new MongoDB.Bson.ObjectId();
 
                 repo_plan.Update(Id, model);
             }
